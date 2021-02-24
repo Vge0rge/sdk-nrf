@@ -35,6 +35,8 @@ manifest:
       url-base: https://github.com/alexa
     - name: nordicsemi
       url-base: https://github.com/NordicSemiconductor
+    - name: nrfxlib
+      url-base: https://github.com/Vge0rge
 
   # If not otherwise specified, the projects below should be obtained
   # from the ncs remote.
@@ -99,7 +101,8 @@ manifest:
     - name: nrfxlib
       repo-path: sdk-nrfxlib
       path: nrfxlib
-      revision: df3d5aa6381fc42d4d429fa2974d8d901b897a12
+      remote: nrfxlib
+      revision: self_contained_platform
     - name: trusted-firmware-m
       repo-path: sdk-trusted-firmware-m
       path: modules/tee/tfm
