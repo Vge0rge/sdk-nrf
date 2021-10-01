@@ -14,8 +14,8 @@
 #include <pm_config.h>
 #include <nrfx_nvmc.h>
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-	static consts struct counter_collection *mcuboot_counter_collection =
+#ifdef CONFIG_MCUBOOT_HW_DOWNGRADE_PREVENTION
+	static const struct counter_collection *mcuboot_counter_collection =
 		(struct counter_collection *)PM_MCUBOOT_PROVISION_ADDRESS;
 #endif
 
@@ -31,15 +31,20 @@ static const struct counter_collection *get_counter_collection(uint16_t counter_
 	switch (counter_desc)
 	{
 
-#ifdef CONFIG_SECURE_BOOT
+#ifdef CONFIG_SECURE_BOOT_STORAGE
 	case COUNTER_DESC_VERSION:
 		collection = (struct counter_collection *) bl_storage_get_counter_collection();
 		break;
 #endif
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-	case COUNTER_DESC_MCUBOOT_HW_COUNTERS:
-		collection = (struct counter_collection *) &mcuboot_counter_collection;
+#ifdef CONFIG_MCUBOOT_HW_DOWNGRADE_PREVENTION
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID0:
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID1:
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID2:
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID3:
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID4:
+	case COUNTER_DESC_MCUBOOT_HW_COUNTER_ID5:
+		collection = (struct counter_collection *) mcuboot_counter_collection;
 		break;
 #endif
 
@@ -139,7 +144,16 @@ static uint16_t get_counter(uint16_t counter_desc, const uint16_t **free_slot)
 
 uint16_t get_monotonic_counter(uint16_t counter_desc)
 {
-	return get_counter(counter_desc, NULL);
+	const uint16_t *next_counter_addr;
+	uint16_t counter = get_counter(counter_desc, &next_counter_addr);
+
+	/* The counter coundn't be found */
+	if (next_counter_addr == NULL || counter == 0xFFFF) {
+		/* No more room. */
+		return -ENOMEM;
+	}
+
+	return (counter + 1);
 }
 
 
@@ -158,6 +172,8 @@ int set_monotonic_counter(uint16_t counter_desc, uint16_t new_counter)
 		return -ENOMEM;
 	}
 
+	/* 0 is not a valid number for the counter */
+	new_counter++;
 	otp_write_halfword(next_counter_addr, ~new_counter);
 	return 0;
 }

@@ -20,10 +20,15 @@ if (CONFIG_MCUBOOT)
     set_shared(IMAGE ${IMAGE_NAME} PROPERTY RAM_FLASH_SIZE ${ram_flash_size})
     set_shared(IMAGE ${IMAGE_NAME} PROPERTY RAM_FLASH_LABEL ${ram_flash_ctrl_label})
   endif()
+
+  if(CONFIG_MCUBOOT_HW_DOWNGRADE_PREVENTION)
+    set_shared(IMAGE ${IMAGE_NAME} PROPERTY MCUBOOT_UPDATEABLE_IMAGE_NUMBER ${CONFIG_UPDATEABLE_IMAGE_NUMBER})
+    set_shared(IMAGE ${IMAGE_NAME} PROPERTY MCUBOOT_HW_DOWNGRADE_PREVENTION ${CONFIG_MCUBOOT_HW_DOWNGRADE_PREVENTION})
+  endif()
+
 endif()
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
-
   include(${ZEPHYR_BASE}/../nrf/cmake/fw_zip.cmake)
 
   function(sign)
@@ -456,7 +461,57 @@ if(CONFIG_BOOTLOADER_MCUBOOT)
         "version_B0=${CONFIG_FW_INFO_FIRMWARE_VERSION}"
         )
     endif()
+
   endif(CONFIG_SIGN_IMAGES)
+
+
+  get_shared(mcuboot_hw_downgrade_prevetion IMAGE mcuboot PROPERTY MCUBOOT_HW_DOWNGRADE_PREVENTION)
+
+  if(${mcuboot_hw_downgrade_prevetion})
+      get_shared(mcuboot_image_number IMAGE mcuboot PROPERTY MCUBOOT_UPDATEABLE_IMAGE_NUMBER)
+
+      set(MCUBOOT_PROVISION_HEX_NAME     mcuboot_provision.hex)
+      set(MCUBOOT_PROVISION_HEX          ${PROJECT_BINARY_DIR}/${MCUBOOT_PROVISION_HEX_NAME})
+
+      add_custom_command(
+        OUTPUT
+        ${MCUBOOT_PROVISION_HEX}
+        COMMAND
+        ${PYTHON_EXECUTABLE}
+        ${NRF_DIR}/scripts/bootloader/mcuboot_counters.py
+        --secure-cnt-addr $<TARGET_PROPERTY:partition_manager,PM_MCUBOOT_PROVISION_ADDRESS>
+        --num-counters ${mcuboot_image_number}
+        --counter-slots 60
+        --output ${MCUBOOT_PROVISION_HEX}
+        --max-size $<TARGET_PROPERTY:partition_manager,PM_MCUBOOT_PROVISION_SIZE>
+        WORKING_DIRECTORY
+        ${PROJECT_BINARY_DIR}
+        COMMENT
+        "Creating security counters for mcuboot, storing to ${MCUBOOT_PROVISION_HEX_NAME}"
+        USES_TERMINAL
+      )
+
+      add_custom_target(
+        mcuboot_provision_target
+        ALL
+        DEPENDS
+        ${MCUBOOT_PROVISION_HEX}
+      )
+
+      set_property(
+        GLOBAL PROPERTY
+        mcuboot_provision_PM_HEX_FILE
+        ${MCUBOOT_PROVISION_HEX}
+      )
+
+      set_property(
+        GLOBAL PROPERTY
+        mcuboot_provision_PM_TARGET
+        mcuboot_provision_target
+      )
+
+  endif()
+
 endif()
 
 # Zephyr has a Kconfig option used for signing an application image
