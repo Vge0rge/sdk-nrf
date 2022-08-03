@@ -68,6 +68,21 @@ config TFM_CRYPTO_ENGINE_BUF_SIZE
 		PSA_CRYPTO_DRIVER_ALG_RSA_PSS_CC3XX
 	default 8320
 
+config TFM_CRYPTO_IOVEC_BUFFER_SIZE
+	int
+	prompt "Internal scratch buffer size for PSA FF IOVec"
+	default 16384 if TFM_REGRESSION_S || TFM_REGRESSION_NS
+	default 0
+	depends on TFM_IPC
+	help
+	  This parameter applies only to IPC model builds. In IPC model,
+	  during a Service call, input and outputs are allocated
+	  temporarily in an internal scratch buffer whose size is
+	  determined by this parameter. To be configured based on the
+	  desired use case and application requirements.
+	  By setting this value to 0 the default value from the TF-M build
+	  system will be used.
+
 config TFM_ITS_ENCRYPTED
 	bool
 	prompt "PSA Internal Trusted Storage with encryption"

@@ -126,4 +126,14 @@ set_property(TARGET zephyr_property_target
     -DCRYPTO_ENGINE_BUF_SIZE=${CONFIG_TFM_CRYPTO_ENGINE_BUF_SIZE}
 )
 
+if (CONFIG_TFM_CRYPTO_IOVEC_BUFFER_SIZE)
+# The TFM_CRYPTO_IOVEC_BUFFER_SIZE holds an internal scratch
+# buffer which needs to be increased for certain use cases
+# (e.g TF-M regression tests)
+    set_property(TARGET zephyr_property_target
+      APPEND PROPERTY TFM_CMAKE_OPTIONS
+        -DCRYPTO_IOVEC_BUFFER_SIZE=${CONFIG_TFM_CRYPTO_IOVEC_BUFFER_SIZE}
+    )
+endif()
+
 zephyr_include_directories(${NRF_DIR}/include/tfm)
