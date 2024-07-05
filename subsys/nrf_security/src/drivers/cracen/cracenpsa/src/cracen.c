@@ -58,7 +58,7 @@ void cracen_acquire(void)
 							     CRACEN_ENABLE_RNG_Msk |
 							     CRACEN_ENABLE_PKEIKG_Msk);
 		irq_enable(CRACEN_IRQn);
-		LOG_DBG_MSG("Power on CRACEN.");
+		//LOG_DBG_MSG("Power on CRACEN.");
 	}
 
 	nrf_security_mutex_unlock(cracen_mutex);
@@ -99,7 +99,7 @@ void cracen_release(void)
 
 		/* Clear pending IRQs at the ARM NVIC */
 		NVIC_ClearPendingIRQ(CRACEN_IRQn);
-		LOG_DBG_MSG("Powered off CRACEN.");
+		//LOG_DBG_MSG("Powered off CRACEN.");
 	}
 
 	nrf_security_mutex_unlock(cracen_mutex);
