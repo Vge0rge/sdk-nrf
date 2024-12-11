@@ -795,7 +795,10 @@ psa_status_t psa_driver_wrapper_derive_key(const psa_key_attributes_t *attribute
 	switch (PSA_KEY_LIFETIME_GET_LOCATION(attributes->lifetime)) {
 	case PSA_KEY_LOCATION_LOCAL_STORAGE:
 		/* Add cases for transparent drivers here */
-#ifdef PSA_NEED_OBERON_KEY_MANAGEMENT_DRIVER
+#ifdef PSA_NEED_CRACEN_KEY_MANAGEMENT_DRIVER
+		return cracen_derive_key(attributes, input, input_length, key_buffer,
+					 key_buffer_size, key_buffer_length);
+#elif PSA_NEED_OBERON_KEY_MANAGEMENT_DRIVER
 		return oberon_derive_key(attributes, input, input_length, key_buffer,
 					 key_buffer_size, key_buffer_length);
 #endif /* PSA_NEED_OBERON_KEY_MANAGEMENT_DRIVER */

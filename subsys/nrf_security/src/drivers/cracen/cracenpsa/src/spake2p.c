@@ -713,3 +713,64 @@ psa_status_t cracen_spake2p_abort(cracen_spake2p_operation_t *operation)
 	safe_memzero(operation, sizeof(*operation));
 	return PSA_SUCCESS;
 }
+
+psa_status_t cracen_derive_spake2p_key(const psa_key_attributes_t *attributes, const uint8_t *input,
+				       size_t input_length, uint8_t *key, size_t key_size,
+				       size_t *key_length)
+{
+	size_t bits = psa_get_key_bits(attributes);
+	psa_key_type_t type = psa_get_key_type(attributes);
+	psa_status_t status;
+
+	switch (type) {
+		// #ifdef PSA_NEED_CRACEN_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE_SECP_R1_256
+	case PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1):
+
+		if (bits != 256) {
+			return PSA_ERROR_NOT_SUPPORTED;
+		}
+
+		if (input_length != 80) {
+			return PSA_ERROR_INVALID_ARGUMENT;
+		}
+
+		if (key_size < 64) {
+			return PSA_ERROR_BUFFER_TOO_SMALL;
+		}
+
+		const struct sx_pk_ecurve *sicurve;
+		status = cracen_ecc_get_ecurve_from_psa(PSA_ECC_FAMILY_SECP_R1, 256, &sicurve);
+
+		if(status != PSA_SUCCESS) {
+			return status;
+		}
+
+		status = cracen_p256_reduce(sicurve, key, input, 40);
+		if (status != PSA_SUCCESS) {
+			return status;
+		}
+
+		// if (!oberon_ct_compare_zero(key, 32)) return PSA_ERROR_INVALID_ARGUMENT;
+		status = cracen_p256_reduce(sicurve, key + 32, input + 40, 40); // w1s -> w1
+		if (status != PSA_SUCCESS) {
+			return status;
+		}
+
+		// if (!oberon_ct_compare_zero(key + 32, 32)) return PSA_ERROR_INVALID_ARGUMENT;
+		*key_length = 64;
+		status = PSA_SUCCESS;
+		break;
+		// #endif /* PSA_NEED_OBERON_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE_SECP_R1_256 */
+
+	default:
+		(void)input;
+		(void)input_length;
+		(void)key;
+		(void)key_size;
+		(void)key_length;
+		(void)bits;
+		status = PSA_ERROR_NOT_SUPPORTED;
+	}
+
+	return status;
+}

@@ -1382,3 +1382,29 @@ psa_status_t cracen_destroy_key(const psa_key_attributes_t *attributes)
 
 	return PSA_ERROR_DOES_NOT_EXIST;
 }
+
+psa_status_t cracen_derive_key(
+    const psa_key_attributes_t *attributes,
+    const uint8_t *input, size_t input_length,
+    uint8_t *key, size_t key_size, size_t *key_length)
+{
+    psa_key_type_t type = psa_get_key_type(attributes);
+
+//#ifdef PSA_NEED_OBERON_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE
+    if (PSA_KEY_TYPE_IS_SPAKE2P_KEY_PAIR(type)) {
+        return cracen_derive_spake2p_key(
+            attributes, input, input_length,
+            key, key_size, key_length);
+    } else
+//#endif /* PSA_NEED_OBERON_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE */
+
+    {
+        (void)input;
+        (void)input_length;
+        (void)key;
+        (void)key_size;
+        (void)key_length;
+        (void)type;
+        return PSA_ERROR_NOT_SUPPORTED;
+    }
+}
