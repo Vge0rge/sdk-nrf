@@ -309,13 +309,13 @@ static psa_status_t cracen_get_confirmation(cracen_spake2p_operation_t *operatio
 		CRACEN_P256_POINT_SIZE + 1, confirmation, CRACEN_SPAKE2P_HASH_LEN, &length);
 }
 
-static psa_status_t cracen_p256_reduce(cracen_spake2p_operation_t *operation,
-				       uint8_t *result_buffer, uint8_t *input, size_t input_length)
+static psa_status_t cracen_p256_reduce(const struct sx_pk_ecurve *curve, uint8_t *result_buffer,
+				       uint8_t *input, size_t input_length)
 {
 	if (!input_length) {
 		return PSA_ERROR_BUFFER_TOO_SMALL;
 	}
-	const uint8_t *order = sx_pk_curve_order(operation->curve);
+	const uint8_t *order = sx_pk_curve_order(curve);
 
 	sx_op modulo = {.sz = CRACEN_P256_KEY_SIZE, .bytes = (char *)order};
 	sx_op b = {.sz = input_length, .bytes = (char *)input};
@@ -448,7 +448,7 @@ static psa_status_t cracen_write_key_share(cracen_spake2p_operation_t *operation
 		return status;
 	}
 
-	status = cracen_p256_reduce(operation, operation->xy, xs, sizeof(xs));
+	status = cracen_p256_reduce(operation->curve, operation->xy, xs, sizeof(xs));
 
 	if (status != PSA_SUCCESS) {
 		return status;
@@ -501,12 +501,12 @@ static psa_status_t set_password_key(cracen_spake2p_operation_t *operation,
 	/* Compute w0 and w1 according to spec. */
 	if (password_length == 2 * CRACEN_P256_KEY_SIZE) {
 		/* Password contains: w0 || w1 */
-		status = cracen_p256_reduce(operation, operation->w0, (uint8_t *)password,
+		status = cracen_p256_reduce(operation->curve, operation->w0, (uint8_t *)password,
 					    password_length / 2);
 		if (status != PSA_SUCCESS) {
 			return status;
 		}
-		status = cracen_p256_reduce(operation, operation->w1_or_L,
+		status = cracen_p256_reduce(operation->curve, operation->w1_or_L,
 					    (uint8_t *)password + password_length / 2,
 					    password_length / 2);
 		if (status != PSA_SUCCESS) {
@@ -515,7 +515,7 @@ static psa_status_t set_password_key(cracen_spake2p_operation_t *operation,
 
 	} else if (password_length == CRACEN_P256_POINT_SIZE + CRACEN_P256_KEY_SIZE + 1) {
 		/* Password contains: w0 || L */
-		status = cracen_p256_reduce(operation, operation->w0, (uint8_t *)password,
+		status = cracen_p256_reduce(operation->curve, operation->w0, (uint8_t *)password,
 					    CRACEN_P256_KEY_SIZE);
 		password += password_length - CRACEN_P256_POINT_SIZE;
 
