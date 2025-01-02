@@ -470,6 +470,55 @@ static psa_status_t import_spake2p_key(const psa_key_attributes_t *attributes, c
 	return PSA_SUCCESS;
 }
 
+psa_status_t cracen_derive_spake2p_key(const psa_key_attributes_t *attributes, const uint8_t *input,
+				       size_t input_length, uint8_t *key, size_t key_size,
+				       size_t *key_length)
+{
+	size_t bits = psa_get_key_bits(attributes);
+	psa_key_type_t type = psa_get_key_type(attributes);
+	psa_status_t status;
+
+	switch (type) {
+	case PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1):
+
+		if (bits != 256) {
+			return PSA_ERROR_NOT_SUPPORTED;
+		}
+
+		if (input_length != 80) {
+			return PSA_ERROR_INVALID_ARGUMENT;
+		}
+
+		if (key_size < 2 * CRACEN_P256_KEY_SIZE) {
+			return PSA_ERROR_BUFFER_TOO_SMALL;
+		}
+
+		status = cracen_ecc_reduce_p256(input, input_length / 2, key, CRACEN_P256_KEY_SIZE);
+		if (status != PSA_SUCCESS) {
+			return status;
+		}
+
+		if (constant_memcmp_is_zero(key, CRACEN_P256_KEY_SIZE)) {
+			return PSA_ERROR_INVALID_ARGUMENT;
+		}
+
+		status = cracen_ecc_reduce_p256(input + (input_length / 2), input_length / 2,
+						key + CRACEN_P256_KEY_SIZE, CRACEN_P256_KEY_SIZE);
+		if (status != PSA_SUCCESS) {
+			return status;
+		}
+
+		if (constant_memcmp_is_zero(key + CRACEN_P256_KEY_SIZE, CRACEN_P256_KEY_SIZE)) {
+			return PSA_ERROR_INVALID_ARGUMENT;
+		}
+
+		*key_length = 2 * CRACEN_P256_KEY_SIZE;
+		return PSA_SUCCESS;
+	default:
+		return PSA_ERROR_NOT_SUPPORTED;
+	}
+}
+
 static psa_status_t import_srp_key(const psa_key_attributes_t *attributes, const uint8_t *data,
 				   size_t data_length, uint8_t *key_buffer, size_t key_buffer_size,
 				   size_t *key_buffer_length, size_t *key_bits)
@@ -1383,28 +1432,22 @@ psa_status_t cracen_destroy_key(const psa_key_attributes_t *attributes)
 	return PSA_ERROR_DOES_NOT_EXIST;
 }
 
-psa_status_t cracen_derive_key(
-    const psa_key_attributes_t *attributes,
-    const uint8_t *input, size_t input_length,
-    uint8_t *key, size_t key_size, size_t *key_length)
+psa_status_t cracen_derive_key(const psa_key_attributes_t *attributes, const uint8_t *input,
+			       size_t input_length, uint8_t *key, size_t key_size,
+			       size_t *key_length)
 {
-    psa_key_type_t type = psa_get_key_type(attributes);
+	psa_key_type_t key_type = psa_get_key_type(attributes);
 
-//#ifdef PSA_NEED_OBERON_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE
-    if (PSA_KEY_TYPE_IS_SPAKE2P_KEY_PAIR(type)) {
-        return cracen_derive_spake2p_key(
-            attributes, input, input_length,
-            key, key_size, key_length);
-    } else
-//#endif /* PSA_NEED_OBERON_KEY_TYPE_SPAKE2P_KEY_PAIR_DERIVE */
+	if (PSA_KEY_TYPE_IS_SPAKE2P_KEY_PAIR(key_type) && IS_ENABLED(PSA_NEED_CRACEN_SPAKE2P)) {
+		return cracen_derive_spake2p_key(attributes, input, input_length, key, key_size,
+						 key_length);
+	}
 
-    {
-        (void)input;
-        (void)input_length;
-        (void)key;
-        (void)key_size;
-        (void)key_length;
-        (void)type;
-        return PSA_ERROR_NOT_SUPPORTED;
-    }
+	(void)input;
+	(void)input_length;
+	(void)key;
+	(void)key_size;
+	(void)key_length;
+	(void)key_type;
+	return PSA_ERROR_NOT_SUPPORTED;
 }
