@@ -673,7 +673,7 @@ int cracen_prepare_ik_key(const uint8_t *user_data)
 	}
 #endif
 
-	struct sx_pk_config_ik cfg = {};
+	__attribute__((unused)) struct sx_pk_config_ik cfg = {};
 
 #ifdef CONFIG_PSA_NEED_CRACEN_PLATFORM_KEYS
 	cfg.device_secret = DEVICE_SECRET_ADDRESS;
@@ -720,7 +720,12 @@ int cracen_prepare_ik_key(const uint8_t *user_data)
 	}
 #endif
 
+
+#if defined(CONFIG_CRACEN_IKG)
 	return sx_pk_ik_derive_keys(&cfg);
+#else
+	return PSA_ERROR_NOT_SUPPORTED;
+#endif
 }
 
 static int cracen_clean_ik_key(const uint8_t *user_data)
