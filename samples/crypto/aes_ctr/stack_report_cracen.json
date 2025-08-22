@@ -1,0 +1,372 @@
+{
+    "cracen_cipher_update": {
+        "max_static_stack_size": 1104,
+        "call_stack": [
+            {
+                "function": "cracen_cipher_update",
+                "name": "cracen_cipher_update",
+                "stack_size": 56
+            },
+            {
+                "function": "crypt_ecb",
+                "name": "crypt_ecb",
+                "stack_size": 256
+            },
+            {
+                "function": "sx_blkcipher_create_aesecb_dec",
+                "name": "sx_blkcipher_create_aesecb_dec",
+                "stack_size": 16
+            },
+            {
+                "function": "sx_blkcipher_create_aes_ba411",
+                "name": "sx_blkcipher_create_aes_ba411",
+                "stack_size": 24
+            },
+            {
+                "function": "sx_blkcipher_hw_reserve",
+                "name": "sx_blkcipher_hw_reserve",
+                "stack_size": 24
+            },
+            {
+                "function": "cracen_prng_value_from_pool",
+                "name": "cracen_prng_value_from_pool",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_get_random",
+                "name": "cracen_get_random",
+                "stack_size": 112
+            },
+            {
+                "function": "cracen_reseed",
+                "name": "cracen_reseed",
+                "stack_size": 56
+            },
+            {
+                "function": "ctr_drbg_update",
+                "name": "ctr_drbg_update",
+                "stack_size": 144
+            },
+            {
+                "function": "sx_blkcipher_ecb_simple",
+                "name": "sx_blkcipher_ecb_simple",
+                "stack_size": 96
+            },
+            {
+                "function": "sx_cmdma_check",
+                "name": "sx_cmdma_check",
+                "stack_size": 8
+            },
+            {
+                "function": "sx_cmdma_check_with_interrupts",
+                "name": "sx_cmdma_check_with_interrupts",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_wait_for_cm_interrupt",
+                "name": "cracen_wait_for_cm_interrupt",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_wait_for_interrupt",
+                "name": "cracen_wait_for_interrupt",
+                "stack_size": 16
+            },
+            {
+                "function": "nrf_security_event_wait",
+                "name": "nrf_security_event_wait",
+                "stack_size": 16
+            },
+            {
+                "function": "z_impl_k_event_wait",
+                "name": "z_impl_k_event_wait",
+                "stack_size": 16
+            },
+            {
+                "function": "k_event_wait_internal",
+                "name": "k_event_wait_internal",
+                "stack_size": 56
+            },
+            {
+                "function": "z_pend_curr",
+                "name": "z_pend_curr",
+                "stack_size": 8
+            },
+            {
+                "function": "pend_locked",
+                "name": "pend_locked",
+                "stack_size": 16
+            },
+            {
+                "function": "add_to_waitq_locked",
+                "name": "add_to_waitq_locked",
+                "stack_size": 16
+            },
+            {
+                "function": "unready_thread",
+                "name": "unready_thread",
+                "stack_size": "???"
+            },
+            {
+                "function": "z_reset_time_slice",
+                "name": "z_reset_time_slice",
+                "stack_size": 16
+            },
+            {
+                "function": "z_add_timeout",
+                "name": "z_add_timeout",
+                "stack_size": 48
+            },
+            {
+                "function": "sys_clock_set_timeout",
+                "name": "sys_clock_set_timeout",
+                "stack_size": 24
+            },
+            {
+                "function": "system_timeout_set_abs",
+                "name": "system_timeout_set_abs",
+                "stack_size": 16
+            },
+            {
+                "function": "nrfx_grtc_syscounter_cc_absolute_set",
+                "name": "nrfx_grtc_syscounter_cc_absolute_set",
+                "stack_size": 24
+            },
+            {
+                "function": "syscounter_check",
+                "name": "syscounter_check",
+                "stack_size": 8
+            },
+            {
+                "function": "is_channel_allocated",
+                "name": "is_channel_allocated",
+                "stack_size": 8
+            },
+            {
+                "function": "allocated_channels_mask_get",
+                "name": "allocated_channels_mask_get",
+                "stack_size": 0
+            }
+        ]
+    },
+    "cracen_cipher_finish": {
+        "max_static_stack_size": 1088,
+        "call_stack": [
+            {
+                "function": "cracen_cipher_finish",
+                "name": "cracen_cipher_finish",
+                "stack_size": 40
+            },
+            {
+                "function": "crypt_ecb",
+                "name": "crypt_ecb",
+                "stack_size": 256
+            },
+            {
+                "function": "sx_blkcipher_create_aesecb_dec",
+                "name": "sx_blkcipher_create_aesecb_dec",
+                "stack_size": 16
+            },
+            {
+                "function": "sx_blkcipher_create_aes_ba411",
+                "name": "sx_blkcipher_create_aes_ba411",
+                "stack_size": 24
+            },
+            {
+                "function": "sx_blkcipher_hw_reserve",
+                "name": "sx_blkcipher_hw_reserve",
+                "stack_size": 24
+            },
+            {
+                "function": "cracen_prng_value_from_pool",
+                "name": "cracen_prng_value_from_pool",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_get_random",
+                "name": "cracen_get_random",
+                "stack_size": 112
+            },
+            {
+                "function": "cracen_reseed",
+                "name": "cracen_reseed",
+                "stack_size": 56
+            },
+            {
+                "function": "ctr_drbg_update",
+                "name": "ctr_drbg_update",
+                "stack_size": 144
+            },
+            {
+                "function": "sx_blkcipher_ecb_simple",
+                "name": "sx_blkcipher_ecb_simple",
+                "stack_size": 96
+            },
+            {
+                "function": "sx_cmdma_check",
+                "name": "sx_cmdma_check",
+                "stack_size": 8
+            },
+            {
+                "function": "sx_cmdma_check_with_interrupts",
+                "name": "sx_cmdma_check_with_interrupts",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_wait_for_cm_interrupt",
+                "name": "cracen_wait_for_cm_interrupt",
+                "stack_size": 8
+            },
+            {
+                "function": "cracen_wait_for_interrupt",
+                "name": "cracen_wait_for_interrupt",
+                "stack_size": 16
+            },
+            {
+                "function": "nrf_security_event_wait",
+                "name": "nrf_security_event_wait",
+                "stack_size": 16
+            },
+            {
+                "function": "z_impl_k_event_wait",
+                "name": "z_impl_k_event_wait",
+                "stack_size": 16
+            },
+            {
+                "function": "k_event_wait_internal",
+                "name": "k_event_wait_internal",
+                "stack_size": 56
+            },
+            {
+                "function": "z_pend_curr",
+                "name": "z_pend_curr",
+                "stack_size": 8
+            },
+            {
+                "function": "pend_locked",
+                "name": "pend_locked",
+                "stack_size": 16
+            },
+            {
+                "function": "add_to_waitq_locked",
+                "name": "add_to_waitq_locked",
+                "stack_size": 16
+            },
+            {
+                "function": "unready_thread",
+                "name": "unready_thread",
+                "stack_size": "???"
+            },
+            {
+                "function": "z_reset_time_slice",
+                "name": "z_reset_time_slice",
+                "stack_size": 16
+            },
+            {
+                "function": "z_add_timeout",
+                "name": "z_add_timeout",
+                "stack_size": 48
+            },
+            {
+                "function": "sys_clock_set_timeout",
+                "name": "sys_clock_set_timeout",
+                "stack_size": 24
+            },
+            {
+                "function": "system_timeout_set_abs",
+                "name": "system_timeout_set_abs",
+                "stack_size": 16
+            },
+            {
+                "function": "nrfx_grtc_syscounter_cc_absolute_set",
+                "name": "nrfx_grtc_syscounter_cc_absolute_set",
+                "stack_size": 24
+            },
+            {
+                "function": "syscounter_check",
+                "name": "syscounter_check",
+                "stack_size": 8
+            },
+            {
+                "function": "is_channel_allocated",
+                "name": "is_channel_allocated",
+                "stack_size": 8
+            },
+            {
+                "function": "allocated_channels_mask_get",
+                "name": "allocated_channels_mask_get",
+                "stack_size": 0
+            }
+        ]
+    },
+    "setup": {
+        "max_static_stack_size": 88,
+        "call_stack": [
+            {
+                "function": "setup",
+                "name": "setup",
+                "stack_size": 56
+            },
+            {
+                "function": "cracen_load_keyref",
+                "name": "cracen_load_keyref",
+                "stack_size": 24
+            },
+            {
+                "function": "safe_memzero",
+                "name": "safe_memzero",
+                "stack_size": 8
+            }
+        ]
+    },
+    "cracen_cipher_encrypt_setup": {
+        "max_static_stack_size": 88,
+        "call_stack": [
+            {
+                "function": "cracen_cipher_encrypt_setup",
+                "name": "cracen_cipher_encrypt_setup",
+                "stack_size": "???"
+            },
+            {
+                "function": "setup",
+                "name": "setup",
+                "stack_size": 56
+            },
+            {
+                "function": "cracen_load_keyref",
+                "name": "cracen_load_keyref",
+                "stack_size": 24
+            },
+            {
+                "function": "safe_memzero",
+                "name": "safe_memzero",
+                "stack_size": 8
+            }
+        ]
+    },
+    "cracen_cipher_decrypt_setup": {
+        "max_static_stack_size": 88,
+        "call_stack": [
+            {
+                "function": "cracen_cipher_decrypt_setup",
+                "name": "cracen_cipher_decrypt_setup",
+                "stack_size": "???"
+            },
+            {
+                "function": "setup",
+                "name": "setup",
+                "stack_size": 56
+            },
+            {
+                "function": "cracen_load_keyref",
+                "name": "cracen_load_keyref",
+                "stack_size": 24
+            },
+            {
+                "function": "safe_memzero",
+                "name": "safe_memzero",
+                "stack_size": 8
+            }
+        ]
+    }
+}

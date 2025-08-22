@@ -1,0 +1,82 @@
+{
+    "oberon_cipher_update": {
+        "max_static_stack_size": 24,
+        "call_stack": [
+            {
+                "function": "oberon_cipher_update",
+                "name": "oberon_cipher_update",
+                "stack_size": 24
+            },
+            {
+                "function": "ocrypto_aes_cbc_pkcs_output_size",
+                "name": "ocrypto_aes_cbc_pkcs_output_size",
+                "stack_size": "???"
+            }
+        ]
+    },
+    "oberon_cipher_finish": {
+        "max_static_stack_size": 16,
+        "call_stack": [
+            {
+                "function": "oberon_cipher_finish",
+                "name": "oberon_cipher_finish",
+                "stack_size": 16
+            },
+            {
+                "function": "memset",
+                "name": "memset",
+                "stack_size": "???"
+            }
+        ]
+    },
+    "oberon_cipher_encrypt_setup": {
+        "max_static_stack_size": 40,
+        "call_stack": [
+            {
+                "function": "oberon_cipher_encrypt_setup",
+                "name": "oberon_cipher_encrypt_setup",
+                "stack_size": 16
+            },
+            {
+                "function": "oberon_cipher_setup",
+                "name": "oberon_cipher_setup",
+                "stack_size": 24
+            },
+            {
+                "function": "ocrypto_aes_cbc_pkcs_init",
+                "name": "ocrypto_aes_cbc_pkcs_init",
+                "stack_size": "???"
+            },
+            {
+                "function": "ocrypto_aes_key_schedule",
+                "name": "ocrypto_aes_key_schedule",
+                "stack_size": "???"
+            }
+        ]
+    },
+    "oberon_cipher_decrypt_setup": {
+        "max_static_stack_size": 40,
+        "call_stack": [
+            {
+                "function": "oberon_cipher_decrypt_setup",
+                "name": "oberon_cipher_decrypt_setup",
+                "stack_size": 16
+            },
+            {
+                "function": "oberon_cipher_setup",
+                "name": "oberon_cipher_setup",
+                "stack_size": 24
+            },
+            {
+                "function": "ocrypto_aes_cbc_pkcs_init",
+                "name": "ocrypto_aes_cbc_pkcs_init",
+                "stack_size": "???"
+            },
+            {
+                "function": "ocrypto_aes_key_schedule",
+                "name": "ocrypto_aes_key_schedule",
+                "stack_size": "???"
+            }
+        ]
+    }
+}

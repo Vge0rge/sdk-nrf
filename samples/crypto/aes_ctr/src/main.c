@@ -35,12 +35,9 @@ LOG_MODULE_REGISTER(aes_ctr, LOG_LEVEL_DBG);
 #define NRF_CRYPTO_EXAMPLE_AES_MAX_TEXT_SIZE (128)
 #define NRF_CRYPTO_EXAMPLE_AES_BLOCK_SIZE (16)
 
-/* AES IV buffer */
-static uint8_t m_iv[NRF_CRYPTO_EXAMPLE_AES_BLOCK_SIZE];
-
 /* Below text is used as plaintext for encryption/decryption */
 static uint8_t m_plain_text[NRF_CRYPTO_EXAMPLE_AES_MAX_TEXT_SIZE] = {
-	"Example string to demonstrate basic usage of AES CTR mode."
+	"Example string to demonstrate basic usage of AES ECB NO PADDING mode."
 };
 
 static uint8_t m_encrypted_text[NRF_CRYPTO_EXAMPLE_AES_MAX_TEXT_SIZE];
@@ -87,7 +84,7 @@ int generate_key(void)
 	psa_set_key_usage_flags(&key_attributes,
 				PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
 	psa_set_key_lifetime(&key_attributes, PSA_KEY_LIFETIME_VOLATILE);
-	psa_set_key_algorithm(&key_attributes, PSA_ALG_CTR);
+	psa_set_key_algorithm(&key_attributes, PSA_ALG_ECB_NO_PADDING);
 	psa_set_key_type(&key_attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&key_attributes, 128);
 
@@ -114,20 +111,12 @@ int encrypt_ctr_aes(void)
 	psa_status_t status;
 	psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
 
-	LOG_INF("Encrypting using AES CTR MODE...");
+	LOG_INF("Encrypting using AES ECB NO PADDING MODE...");
 
 	/* Setup the encryption operation */
-	status = psa_cipher_encrypt_setup(&operation, key_id, PSA_ALG_CTR);
+	status = psa_cipher_encrypt_setup(&operation, key_id, PSA_ALG_ECB_NO_PADDING);
 	if (status != PSA_SUCCESS) {
 		LOG_INF("psa_cipher_encrypt_setup failed! (Error: %d)", status);
-		return APP_ERROR;
-	}
-
-	/* Generate a random IV */
-	status = psa_cipher_generate_iv(&operation, m_iv, sizeof(m_iv),
-					&olen);
-	if (status != PSA_SUCCESS) {
-		LOG_INF("psa_cipher_generate_iv failed! (Error: %d)", status);
 		return APP_ERROR;
 	}
 
@@ -161,7 +150,6 @@ int encrypt_ctr_aes(void)
 	}
 
 	LOG_INF("Encryption successful!\r\n");
-	PRINT_HEX("IV", m_iv, sizeof(m_iv));
 	PRINT_HEX("Plaintext", m_plain_text, sizeof(m_plain_text));
 	PRINT_HEX("Encrypted text", m_encrypted_text, sizeof(m_encrypted_text));
 
@@ -174,19 +162,12 @@ int decrypt_ctr_aes(void)
 	psa_status_t status;
 	psa_cipher_operation_t operation = PSA_CIPHER_OPERATION_INIT;
 
-	LOG_INF("Decrypting using AES CTR MODE...");
+	LOG_INF("Decrypting using AES ECB NO PADDING MODE...");
 
 	/* Setup the decryption operation */
-	status = psa_cipher_decrypt_setup(&operation, key_id, PSA_ALG_CTR);
+	status = psa_cipher_decrypt_setup(&operation, key_id, PSA_ALG_ECB_NO_PADDING);
 	if (status != PSA_SUCCESS) {
 		LOG_INF("psa_cipher_decrypt_setup failed! (Error: %d)", status);
-		return APP_ERROR;
-	}
-
-	/* Set the IV to the one generated during encryption */
-	status = psa_cipher_set_iv(&operation, m_iv, sizeof(m_iv));
-	if (status != PSA_SUCCESS) {
-		LOG_INF("psa_cipher_set_iv failed! (Error: %d)", status);
 		return APP_ERROR;
 	}
 
@@ -268,6 +249,23 @@ int main(void)
 	}
 
 	LOG_INF(APP_SUCCESS_MESSAGE);
+
+	extern uint8_t *z_main_stack;
+	uint8_t *start_of_stack = &z_main_stack; 
+	uint8_t *pnt_stack = start_of_stack;
+
+	while( *pnt_stack == 0xAA){
+		pnt_stack += 1;
+	}
+	LOG_INF("The address of the last AA %lx", pnt_stack); 
+	LOG_HEXDUMP_INF(pnt_stack - 5 , 10 , "The switch point");
+	uint32_t the_aa_bytes = pnt_stack - start_of_stack;
+	uint32_t stack_used = 4096 - the_aa_bytes;
+	LOG_INF("The aa bytes %lu", the_aa_bytes); 
+	LOG_INF("The stack used %lu", stack_used); 
+
+       //LOG_HEXDUMP_INF(0x20004a60 , 4096, "The data");
+
 
 	return APP_SUCCESS;
 }
