@@ -1201,10 +1201,6 @@ psa_status_t cracen_kmu_get_builtin_key(psa_drv_slot_number_t slot_number,
 		return PSA_ERROR_INVALID_ARGUMENT;
 	}
 
-	if(!cracen_builtin_kmu_usage_allowed(slot_number, attributes)){
-		return PSA_ERROR_NOT_PERMITTED;
-	}
-
 	psa_status = clean_up_unfinished_provisioning();
 	if (psa_status != PSA_SUCCESS) {
 		return psa_status;

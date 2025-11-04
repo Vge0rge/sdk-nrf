@@ -963,6 +963,19 @@ psa_status_t cracen_import_key(const psa_key_attributes_t *attributes, const uin
 		}
 #endif
 
+		if (PSA_KEY_LIFETIME_GET_LOCATION(psa_get_key_lifetime(attributes)) ==
+			PSA_KEY_LOCATION_CRACEN) {
+
+			if(!cracen_builtin_ikg_usage_allowed(slot_id, attributes)){
+				return PSA_ERROR_NOT_PERMITTED;
+			}
+		} else if (PSA_KEY_LIFETIME_GET_LOCATION(psa_get_key_lifetime(attributes)) ==
+			PSA_KEY_LOCATION_CRACEN_KMU) {
+			if(!cracen_builtin_kmu_usage_allowed(slot_id, attributes)){
+				return PSA_ERROR_NOT_PERMITTED;
+			}
+		}
+
 		size_t opaque_key_size;
 		psa_status_t status = cracen_get_opaque_size(attributes, &opaque_key_size);
 
@@ -1287,10 +1300,6 @@ static psa_status_t cracen_ikg_get_builtin_key(psa_drv_slot_number_t slot_number
 	size_t opaque_key_size;
 	psa_status_t status = PSA_ERROR_INVALID_ARGUMENT;
 
-	if(!cracen_builtin_ikg_usage_allowed(slot_number, attributes)){
-		return PSA_ERROR_NOT_PERMITTED;
-	}
-
 	/* According to the PSA Crypto Driver specification, the PSA core will set the `id`
 	 * and the `lifetime` field of the attribute struct. We will fill all the other
 	 * attributes, and update the `lifetime` field to be more specific.
@@ -1370,6 +1379,10 @@ psa_status_t cracen_get_builtin_key(psa_drv_slot_number_t slot_number,
 	case CRACEN_BUILTIN_MKEK_ID:
 	case CRACEN_BUILTIN_MEXT_ID:
 		if (IS_ENABLED(CONFIG_CRACEN_IKG)) {
+			if(!cracen_builtin_ikg_usage_allowed(slot_number, attributes)){
+				return PSA_ERROR_NOT_PERMITTED;
+			}
+
 			return cracen_ikg_get_builtin_key(slot_number, attributes, key_buffer,
 							  key_buffer_size, key_buffer_length);
 		} else {
@@ -1377,6 +1390,9 @@ psa_status_t cracen_get_builtin_key(psa_drv_slot_number_t slot_number,
 		}
 	default:
 #ifdef PSA_NEED_CRACEN_KMU_DRIVER
+		if(!cracen_builtin_kmu_usage_allowed(slot_number, attributes)){
+			return PSA_ERROR_NOT_PERMITTED;
+		}
 		return cracen_kmu_get_builtin_key(slot_number, attributes, key_buffer,
 						  key_buffer_size, key_buffer_length);
 #elif PSA_NEED_CRACEN_PLATFORM_KEYS

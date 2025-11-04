@@ -39,7 +39,9 @@ const cracen_builtin_ikg_key_policy_t g_builtin_ikg_policy[] = {
 };
 
 const cracen_builtin_kmu_key_policy_t g_builtin_kmu_policy[] = { 
-    { .user = MAPPED_TZ_NS_AGENT_DEFAULT_CLIENT_ID, .key_slot_start = 10, .key_slot_end = 20, .kmu_entry_type = KMU_ENTRY_SLOT_RANGE}
+    { .user = TFM_SP_ITS, .key_slot_start = 0, .key_slot_end = 255, .kmu_entry_type = KMU_ENTRY_SLOT_RANGE},
+    { .user = TFM_SP_CRYPTO, .key_slot_start = 0, .key_slot_end = 255, .kmu_entry_type = KMU_ENTRY_SLOT_RANGE},
+    { .user = MAPPED_TZ_NS_AGENT_DEFAULT_CLIENT_ID, .key_slot_start = 0, .key_slot_end = 90, .kmu_entry_type = KMU_ENTRY_SLOT_RANGE}
 };
 
 
@@ -59,6 +61,13 @@ bool cracen_builtin_ikg_usage_allowed(psa_drv_slot_number_t slot_number, psa_key
 bool cracen_builtin_kmu_usage_allowed(psa_drv_slot_number_t slot_number, psa_key_attributes_t *attributes)
 {
     tfm_crypto_library_key_id_t key_id = psa_get_key_id(attributes);
+
+    volatile int32_t owner = CRYPTO_LIBRARY_GET_OWNER(key_id);
+
+    while(owner == 0xF3F3F5F5)
+    {
+        return false;
+    }
 
     for(uint32_t i = 0; i < NUMBER_OF_ELEMENTS_OF(g_builtin_kmu_policy); i++) {
 
