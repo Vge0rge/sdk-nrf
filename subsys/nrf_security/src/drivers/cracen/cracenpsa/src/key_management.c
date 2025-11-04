@@ -25,6 +25,7 @@
 #include <sxsymcrypt/keyref.h>
 #include <zephyr/sys/__assert.h>
 #include <zephyr/sys/byteorder.h>
+#include <cracen_builtin_keys.h>
 
 extern const uint8_t cracen_N3072[384];
 
@@ -1285,6 +1286,10 @@ static psa_status_t cracen_ikg_get_builtin_key(psa_drv_slot_number_t slot_number
 {
 	size_t opaque_key_size;
 	psa_status_t status = PSA_ERROR_INVALID_ARGUMENT;
+
+	if(!cracen_builtin_ikg_usage_allowed(slot_number, attributes)){
+		return PSA_ERROR_NOT_PERMITTED;
+	}
 
 	/* According to the PSA Crypto Driver specification, the PSA core will set the `id`
 	 * and the `lifetime` field of the attribute struct. We will fill all the other
