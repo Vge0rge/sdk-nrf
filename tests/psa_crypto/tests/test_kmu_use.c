@@ -25,7 +25,7 @@ LOG_MODULE_DECLARE(app, LOG_LEVEL_DBG);
 /*			Global variables/defines for the IKG encryption sample		  */
 #define NRF_CRYPTO_EXAMPLE_EDDSA_TEXT_SIZE (100)
 #define NRF_CRYPTO_EXAMPLE_EDDSA_SIGNATURE_SIZE (64)
-#define KMU_SLOT_NUM 125
+#define KMU_SLOT_NUM 180
 
 /* Below text is used as plaintext for signing/verification */
 static uint8_t m_plain_text[NRF_CRYPTO_EXAMPLE_EDDSA_TEXT_SIZE] = {

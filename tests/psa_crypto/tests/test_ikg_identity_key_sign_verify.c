@@ -17,10 +17,15 @@
 #include <zephyr/sys/printk.h>
 #include "psa_tests_common.h"
 
+
 #ifdef CONFIG_BUILD_WITH_TFM
 #include <tfm_ns_interface.h>
 #include <tfm_builtin_key_ids.h>
+
+#if defined(NRF54L15_XXAA)
 #include "cracen_psa_kmu.h"
+#endif
+
 static psa_key_id_t identity_key_id = TFM_BUILTIN_KEY_ID_IAK;
 #else
 #include <cracen_psa.h>

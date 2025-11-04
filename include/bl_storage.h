@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#define PM_PROVISION_ADDRESS 0
 #ifndef BL_STORAGE_H_
 #define BL_STORAGE_H_
 

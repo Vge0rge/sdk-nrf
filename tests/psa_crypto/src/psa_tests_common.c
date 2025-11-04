@@ -25,7 +25,11 @@
 #ifdef CONFIG_BUILD_WITH_TFM
 #include <tfm_ns_interface.h>
 #include <tfm_builtin_key_ids.h>
+
+#if defined(NRF54L15_XXAA)
 #include "cracen_psa_kmu.h"
+#endif
+
 #include <tfm_crypto_defs.h>
 #else
 #include <cracen_psa.h>

@@ -13,6 +13,9 @@
 #include <pm_config.h>
 #include <ctype.h>
 
+#include <psa/crypto.h>
+#include <tfm_builtin_key_ids.h>
+
 /* Define an example stats group; approximates seconds since boot. */
 STATS_SECT_START(smp_svr_stats)
 STATS_SECT_ENTRY(ticks)
@@ -149,6 +152,67 @@ static void get_attestation_token(void)
 	}
 }
 
+static psa_key_id_t identity_key_id = TFM_BUILTIN_KEY_ID_IAK;
+#define NRF_CRYPTO_TEST_IKG_TEXT_SIZE (68)
+#define NRF_CRYPTO_TEST_IKG_SIGNATURE_SIZE (64)
+#define NRF_CRYPTO_EXAMPLE_ECDSA_PUBLIC_KEY_SIZE (65)
+
+int get_identity_key(void)
+{
+	uint8_t l_m_pub_key[NRF_CRYPTO_EXAMPLE_ECDSA_PUBLIC_KEY_SIZE];
+	uint8_t l_m_signature[NRF_CRYPTO_TEST_IKG_SIGNATURE_SIZE];
+	psa_key_handle_t l_key_handle;
+	psa_key_id_t l_key_id;
+
+	psa_status_t status;
+	psa_key_attributes_t key_attributes = PSA_KEY_ATTRIBUTES_INIT;
+	size_t data_length;
+
+	l_key_handle = mbedtls_svc_key_id_make(0, identity_key_id);
+	psa_key_attributes_t attr = key_attributes;
+
+	status = psa_get_key_attributes(l_key_handle, &attr);
+	if (status != 0) {
+		return status;
+	}
+
+	status = psa_export_public_key(l_key_handle,
+		l_m_pub_key,
+		sizeof(l_m_pub_key),
+		&data_length);
+
+	if (status != 0) {
+		return status;
+	}
+	return 0;
+}
+
+int sign_message(void)
+{
+	uint32_t output_len;
+	psa_status_t status;
+	/* Below text is used as plaintext for signing/verification */
+	static uint8_t m_plain_text[NRF_CRYPTO_TEST_IKG_TEXT_SIZE] = {
+			"Example string to demonstrate basic usage of the IKG identity key."
+	};
+
+	static uint8_t m_signature[NRF_CRYPTO_TEST_IKG_SIGNATURE_SIZE];
+
+	status = psa_sign_message(identity_key_id,
+		PSA_ALG_ECDSA(PSA_ALG_SHA_256),
+		m_plain_text,
+		sizeof(m_plain_text),
+		m_signature,
+		sizeof(m_signature),
+		&output_len);
+
+	if (status != PSA_SUCCESS) {
+		return status;
+	}
+
+	return 0;
+}
+
 int main(void)
 {
 	int err;
@@ -165,6 +229,20 @@ int main(void)
 
 	get_fw_info();
 	get_attestation_token();
+
+	err = get_identity_key();
+	if(err != 0){
+		printk("It seems that I cannot access IAK :) :) :) (error code %d) \n", err);
+	} else {
+		printk("IAK is here and happy  :/ :/ :/ \n");
+		err = sign_message();
+		if(err !=0){
+			printk("Yeeeeah! I cannot sign! :) :) :) (error code %d) \n",err );
+		} else {
+			printk("Noooooooo! I can sign! :/ :/ :/ \n");
+
+		}
+	}
 
 	/* The system work queue handles all incoming mcumgr requests.  Let the
 	 * main thread idle while the mcumgr server runs.
