@@ -18,7 +18,7 @@
 #include "sxsymcrypt/keyref.h"
 
 #ifdef __NRF_TFM__
-#include <tfm_builtin_key_loader.h>
+//#include <tfm_builtin_key_loader.h>
 #endif
 
 /**
