@@ -963,22 +963,16 @@ psa_status_t cracen_import_key(const psa_key_attributes_t *attributes, const uin
 		}
 #endif
 
-		if (PSA_KEY_LIFETIME_GET_LOCATION(psa_get_key_lifetime(attributes)) ==
-			PSA_KEY_LOCATION_CRACEN) {
-
-			if(!cracen_builtin_ikg_usage_allowed(slot_id, attributes)){
-				return PSA_ERROR_NOT_PERMITTED;
-			}
-		} else if (PSA_KEY_LIFETIME_GET_LOCATION(psa_get_key_lifetime(attributes)) ==
-			PSA_KEY_LOCATION_CRACEN_KMU) {
-			if(!cracen_builtin_kmu_usage_allowed(slot_id, attributes)){
-				return PSA_ERROR_NOT_PERMITTED;
-			}
-		}
 
 		size_t opaque_key_size;
-		psa_status_t status = cracen_get_opaque_size(attributes, &opaque_key_size);
-
+		psa_status_t status;
+	
+		status = cracen_builtin_key_is_usage_allowed(slot_id, attributes);
+		if (status != PSA_SUCCESS) {
+			return status;
+		}
+		
+		status = cracen_get_opaque_size(attributes, &opaque_key_size);
 		if (status != PSA_SUCCESS) {
 			return status;
 		}
@@ -986,6 +980,7 @@ psa_status_t cracen_import_key(const psa_key_attributes_t *attributes, const uin
 		if (key_buffer_size < opaque_key_size) {
 			return PSA_ERROR_BUFFER_TOO_SMALL;
 		}
+
 
 		status = cracen_kmu_provision(attributes, slot_id, data, data_length);
 		if (status != PSA_SUCCESS) {
@@ -1379,7 +1374,7 @@ psa_status_t cracen_get_builtin_key(psa_drv_slot_number_t slot_number,
 	case CRACEN_BUILTIN_MKEK_ID:
 	case CRACEN_BUILTIN_MEXT_ID:
 		if (IS_ENABLED(CONFIG_CRACEN_IKG)) {
-			if(!cracen_builtin_ikg_usage_allowed(slot_number, attributes)){
+			if(!cracen_builtin_usage_allowed(slot_number, attributes)){
 				return PSA_ERROR_NOT_PERMITTED;
 			}
 
@@ -1390,9 +1385,10 @@ psa_status_t cracen_get_builtin_key(psa_drv_slot_number_t slot_number,
 		}
 	default:
 #ifdef PSA_NEED_CRACEN_KMU_DRIVER
-		if(!cracen_builtin_kmu_usage_allowed(slot_number, attributes)){
+		if(!cracen_builtin_usage_allowed(slot_number, attributes)){
 			return PSA_ERROR_NOT_PERMITTED;
 		}
+
 		return cracen_kmu_get_builtin_key(slot_number, attributes, key_buffer,
 						  key_buffer_size, key_buffer_length);
 #elif PSA_NEED_CRACEN_PLATFORM_KEYS

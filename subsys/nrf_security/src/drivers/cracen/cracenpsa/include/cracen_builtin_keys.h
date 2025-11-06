@@ -11,7 +11,7 @@
 #include <psa/crypto.h>
 #include <psa/crypto_values.h>
 
-#ifdef CONFIG_BUILD_WITH_TFM
+#if defined(CONFIG_BUILD_WITH_TFM)
 
 typedef struct
 {
@@ -32,24 +32,17 @@ typedef struct
     cracen_kmu_entry_type_t kmu_entry_type;
 } cracen_builtin_kmu_key_policy_t;
 
-bool cracen_builtin_ikg_usage_allowed(psa_drv_slot_number_t slot_number, const psa_key_attributes_t *attributes);
-
-bool cracen_builtin_kmu_usage_allowed(psa_drv_slot_number_t slot_number, const psa_key_attributes_t *attributes);
+bool cracen_builtin_key_is_usage_allowed(psa_drv_slot_number_t slot_id, const psa_key_attributes_t *attributes);
 
 #else 
 
-static inline bool cracen_builtin_ikg_usage_allowed(psa_drv_slot_number_t slot_number, const psa_key_attributes_t *attributes)
+static inline bool cracen_builtin_key_is_usage_allowed(psa_drv_slot_number_t slot_id, const psa_key_attributes_t *attributes)
 {
     (void) slot_number;
     (void) attributes;
     return true;
 }
 
-static inline bool cracen_builtin_kmu_usage_allowed(psa_drv_slot_number_t slot_number, const psa_key_attributes_t *attributes)
-{
-    (void) slot_number;
-    (void) attributes;
-    return true;
-}
+#endif /* BUILD_WITH_TFM */
 
 #endif /* CRACEN_PSA_BUILTIN_IDS_H */
