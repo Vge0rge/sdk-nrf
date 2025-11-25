@@ -17,12 +17,17 @@
 
 #include <hal/nrf_gpio.h>
 #include <hal/nrf_regulators.h>
+#include <zephyr/autoconf.h>
 
 #include "handle_attr.h"
 
 #if NRF_ALLOW_NON_SECURE_FAULT_HANDLING
 #include "ns_fault_service.h"
 #endif /* CONFIG_TFM_ALLOW_NON_SECURE_FAULT_HANDLING */
+
+#if defined(CONFIG_BUILD_WITH_TFM)
+#error "nooooooooooooooooooooooooooooooooooooooo"
+#endif
 
 void tfm_platform_hal_system_reset(void)
 {
