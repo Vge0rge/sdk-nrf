@@ -17,6 +17,7 @@ kconfig_check_and_set_base_int(MBEDTLS_PSA_KEY_SLOT_COUNT)
 # Platform
 kconfig_check_and_set_base(MBEDTLS_PLATFORM_C)
 kconfig_check_and_set_base(MBEDTLS_PLATFORM_MEMORY)
+kconfig_check_and_set_base(MBEDTLS_PLATFORM_NO_STD_FUNCTIONS)
 kconfig_check_and_set_base(MBEDTLS_MEMORY_BUFFER_ALLOC_C)
 
 # TF-M
