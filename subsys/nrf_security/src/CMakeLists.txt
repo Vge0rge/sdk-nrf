@@ -64,20 +64,20 @@ endif()
 
 if(NOT CONFIG_MBEDTLS_PSA_CRYPTO_SPM AND NOT BUILD_INSIDE_TFM)
   append_with_prefix(src_crypto ${ZEPHYR_MBEDTLS_MODULE_DIR}/library
-    pem.c
-    pkcs12.c
-    pkcs5.c
-    pkparse.c
-    pkwrite.c
-    dhm.c
-    cipher.c
-    cipher_wrap.c
-    md.c
-    pk.c
-    pk_ecc.c
-    pk_wrap.c
-    pkwrite.c
-    psa_util.c
+#     pem.c
+#     pkcs12.c
+#     pkcs5.c
+#     pkparse.c
+#     pkwrite.c
+#     dhm.c
+#     cipher.c
+#     cipher_wrap.c
+#     md.c
+#     pk.c
+#     pk_ecc.c
+#     pk_wrap.c
+#     pkwrite.c
+#     psa_util.c
   )
 
 endif()
@@ -104,23 +104,22 @@ endif()
 nrf_security_add_zephyr_options(${mbedcrypto_target})
 
 # Base mbed TLS files (not in drivers or builtin's)
-append_with_prefix(src_crypto_base ${ZEPHYR_MBEDTLS_MODULE_DIR}/library
-  asn1parse.c
-  asn1write.c
-  base64.c
-  bignum.c
-  bignum_core.c
-  nist_kw.c
-  oid.c
-  padlock.c
-  version.c
-  constant_time.c
+append_with_prefix(src_crypto_base ${ZEPHYR_TF_PSA_CRYPTO_MODULE_DIR}/utilities
+#   asn1parse.c
+#   asn1write.c
+#   base64.c
+#   bignum.c
+#   bignum_core.c
+#   nist_kw.c
+#   oid.c
+#   padlock.c
+#   version.c
 )
 
 # Legacy APIs were missing files added by Oberon PSA core (not built in
 # certain instances. This adds the same platform support as the Oberon PSA core)
 if(NOT CONFIG_MBEDTLS_PSA_CRYPTO_C)
-  append_with_prefix(src_crypto_base  ${ZEPHYR_OBERON_PSA_CRYPTO_MODULE_DIR}/library/
+  append_with_prefix(src_crypto_base ${ZEPHYR_OBERON_PSA_CRYPTO_MODULE_DIR}/platform/
     platform.c
     platform_util.c
   )
