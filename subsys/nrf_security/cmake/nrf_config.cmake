@@ -6,22 +6,9 @@
 # Convert all platform and TLS/DTLS and X.509 Kconfig variables for Mbed TLS
 # (strip CONFIG_)
 
-# TF-M
-kconfig_check_and_set_base(MBEDTLS_PSA_CRYPTO_SPM)
-
-# PSA core configurations
-kconfig_check_and_set_base(MBEDTLS_PSA_CRYPTO_CLIENT)
-kconfig_check_and_set_base(MBEDTLS_PSA_CRYPTO_C)
-kconfig_check_and_set_base(MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER)
-kconfig_check_and_set_base(MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS)
-
 # Platform
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_C)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_MEMORY)
 kconfig_check_and_set_base(MBEDTLS_NO_PLATFORM_ENTROPY)
-kconfig_check_and_set_base(MBEDTLS_MEMORY_BUFFER_ALLOC_C)
 kconfig_check_and_set_base(MBEDTLS_DEBUG_C)
-kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG)
 
 # Threading configurations for CryptoCell and locally built PSA core
 kconfig_check_and_set_base(MBEDTLS_THREADING_C)

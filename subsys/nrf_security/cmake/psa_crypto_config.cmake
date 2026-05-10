@@ -5,8 +5,22 @@
 #
 # Convert all standard Kconfig variables for mbed TLS (strip CONFIG_)
 
-# PSA Core implementation
-kconfig_check_and_set_base_to_one(PSA_CORE_OBERON)
+# PSA core
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS)
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_DRIVERS)
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG)
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER)
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_STORAGE_C)
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_STATIC_KEY_SLOTS)
+kconfig_check_and_set_base_int(MBEDTLS_PSA_KEY_SLOT_COUNT)
+
+# Platform
+kconfig_check_and_set_base(MBEDTLS_PLATFORM_C)
+kconfig_check_and_set_base(MBEDTLS_PLATFORM_MEMORY)
+kconfig_check_and_set_base(MBEDTLS_MEMORY_BUFFER_ALLOC_C)
+
+# TF-M
+kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_SPM)
 
 # Convert CRACEN driver configuration
 kconfig_check_and_set_base_to_one(PSA_CRYPTO_DRIVER_CRACEN)
@@ -491,7 +505,6 @@ kconfig_check_and_set_base_to_one(PSA_NEED_OBERON_ASCON_XOF128)
 kconfig_check_and_set_base_to_one(PSA_NEED_OBERON_ASCON_CXOF128)
 kconfig_check_and_set_base_to_one(PSA_NEED_OBERON_XOF_DRIVER)
 
-
 # Convert NRF_RNG driver configuration
 kconfig_check_and_set_base_to_one(PSA_NEED_NRF_RNG_ENTROPY_DRIVER)
 kconfig_check_and_set_base_to_one(PSA_NEED_CRACEN_TRNG_DRIVER)
@@ -504,12 +517,6 @@ kconfig_check_and_set_base_to_one(PSA_NEED_CRACEN_CTR_SIZE_WORKAROUNDS)
 kconfig_check_and_set_base_to_one(PSA_NEED_CRACEN_IKG_INTERRUPT_WORKAROUND)
 kconfig_check_and_set_base_to_one(PSA_NEED_CRACEN_RNG_NO_ENTROPY_WORKAROUND)
 kconfig_check_and_set_base_to_one(PSA_NEED_CRACEN_ECC_KEY_GEN_PKE)
-
-# PSA and Drivers
-kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_STORAGE_C)
-kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_DRIVERS)
-kconfig_check_and_set_base_int(MBEDTLS_PSA_KEY_SLOT_COUNT)
-kconfig_check_and_set_base_to_one(MBEDTLS_PSA_STATIC_KEY_SLOTS)
 
 # Generate the PSA config file (default nrf-psa-crypto-config.h)
 configure_file(${NRF_SECURITY_DIR}/configs/psa_crypto_config.h.template

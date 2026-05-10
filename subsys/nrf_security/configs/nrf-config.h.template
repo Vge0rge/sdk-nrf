@@ -16,25 +16,9 @@
  * not used
  */
 
-/* TF-M */
-#cmakedefine MBEDTLS_PSA_CRYPTO_SPM
-
-/* PSA core configurations */
-#cmakedefine MBEDTLS_PSA_CRYPTO_CLIENT
-#cmakedefine MBEDTLS_PSA_CRYPTO_C
-#cmakedefine MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
-/* Avoid redefinition as TF-M defines this on the command line */
-#ifndef MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER
-#cmakedefine MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER
-#endif
-
 /* Platform */
-#cmakedefine MBEDTLS_PLATFORM_C
-#cmakedefine MBEDTLS_PLATFORM_MEMORY
 #cmakedefine MBEDTLS_NO_PLATFORM_ENTROPY
-#cmakedefine MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #cmakedefine MBEDTLS_DEBUG_C
-#cmakedefine MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
 
 /* Platform configurations for _ALT defines */
 #cmakedefine MBEDTLS_PLATFORM_EXIT_ALT
