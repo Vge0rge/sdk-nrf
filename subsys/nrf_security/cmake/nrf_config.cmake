@@ -14,16 +14,6 @@ kconfig_check_and_set_base(MBEDTLS_DEBUG_C)
 kconfig_check_and_set_base(MBEDTLS_THREADING_C)
 kconfig_check_and_set_base(MBEDTLS_THREADING_ALT)
 
-# Platform configurations for _ALT defines
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_EXIT_ALT)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_FPRINTF_ALT)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_PRINTF_ALT)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_SNPRINTF_ALT)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT)
-kconfig_check_and_set_base(MBEDTLS_ENTROPY_HARDWARE_ALT)
-kconfig_check_and_set_base(MBEDTLS_THREADING_ALT)
-kconfig_check_and_set_base(MBEDTLS_PLATFORM_ZEROIZE_ALT)
-
 # Legacy configurations for _ALT defines
 kconfig_check_and_set_base(MBEDTLS_AES_SETKEY_ENC_ALT)
 kconfig_check_and_set_base(MBEDTLS_AES_SETKEY_DEC_ALT)

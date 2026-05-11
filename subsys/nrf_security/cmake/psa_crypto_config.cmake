@@ -20,6 +20,13 @@ kconfig_check_and_set_base(MBEDTLS_PLATFORM_MEMORY)
 kconfig_check_and_set_base(MBEDTLS_PLATFORM_NO_STD_FUNCTIONS)
 kconfig_check_and_set_base(MBEDTLS_MEMORY_BUFFER_ALLOC_C)
 
+# Platform _ALT
+kconfig_check_and_set_base_to_one(MBEDTLS_PLATFORM_EXIT_ALT)
+kconfig_check_and_set_base_to_one(MBEDTLS_PLATFORM_FPRINTF_ALT)
+kconfig_check_and_set_base_to_one(MBEDTLS_PLATFORM_PRINTF_ALT)
+kconfig_check_and_set_base_to_one(MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT)
+kconfig_check_and_set_base_to_one(MBEDTLS_PLATFORM_SNPRINTF_ALT)
+
 # TF-M
 kconfig_check_and_set_base_to_one(MBEDTLS_PSA_CRYPTO_SPM)
 
