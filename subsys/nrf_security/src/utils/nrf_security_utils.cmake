@@ -21,12 +21,16 @@ target_include_directories(psa_crypto_library_config
 )
 
 if(BUILD_INSIDE_TFM)
-  # This gives access to cmsis, nrfx and mdk and the tfm_sp_log used by 
-  # __assert.h
+  # This gives access to cmsis, nrfx and mdk. Link tfm_log_unpriv to
+  # resolve the tfm_log_unpriv() symbol forward-declared by the
+  # Zephyr-compat <zephyr/sys/__assert.h> shim (the replacement
+  # for the removed tfm_sp_log target). Using tfm_log_unpriv directly
+  # rather than tfm_sprt avoids dragging the partition runtime into
+  # this generic utility library.
   target_link_libraries(nrf_security_utils
     PUBLIC
       platform_s
-      tfm_sp_log
+      tfm_log_unpriv
       tfm_psa_rot_partition_crypto
   )
 else()

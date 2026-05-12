@@ -16,8 +16,22 @@
  */
 
 #include <zephyr/autoconf.h>
-#include "tfm_sp_log.h"
+
 #include "utilities.h"
+
+/*
+ * Forward-declare tfm_log_unpriv() instead of including <tfm_log_unpriv.h> so
+ * that consumers of this Zephyr-compat shim header do not need the TF-M
+ * unprivileged-log include path on their own target. The symbol is resolved
+ * at link time by whichever component pulls in the tfm_log_unpriv library.
+ */
+#if defined(__ICCARM__)
+#pragma __printf_args
+void tfm_log_unpriv(const char *fmt, ...);
+#else
+__attribute__((format(printf, 1, 2)))
+void tfm_log_unpriv(const char *fmt, ...);
+#endif
 
 #ifdef CONFIG_ASSERT
 /* Use same print mode as non-secure. */
@@ -37,7 +51,7 @@
 #define _STRINGIFY(s) #s
 
 #if defined(__ASSERT_VERBOSE)
-#define __ASSERT_PRINT(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define __ASSERT_PRINT(fmt, ...) tfm_log_unpriv(fmt, ##__VA_ARGS__)
 #else
 #define __ASSERT_PRINT(fmt, ...)
 #endif
