@@ -50,14 +50,15 @@ target_link_libraries(cracen_psa_driver
 )
 
 # Give access to cmsis, nrfx and MDK inside TF-M build
-# to allow for referencing nRF events. Note that
-# tfm_sp_log needs to be added because __assert.h requires
-# it
+# to allow for referencing nRF events. Link tfm_log_unpriv to
+# resolve the tfm_log_unpriv() symbol forward-declared by the
+# Zephyr-compat <zephyr/sys/__assert.h> shim (the replacement
+# for the removed tfm_sp_log target).
 if(BUILD_INSIDE_TFM)
   target_link_libraries(cracen_psa_driver
     PRIVATE
       platform_s
-      tfm_sp_log
+      tfm_log_unpriv
   )
 else()
   # Ensure zephyr/offsets.h is generated as this is a dependency for CRACEN driver

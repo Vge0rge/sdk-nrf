@@ -117,7 +117,9 @@ if(${TFM_PARTITION_CRYPTO})
   target_link_libraries(platform_crypto_keys
     PUBLIC
     platform_s
-    # Link with tfm_sprt to get the include path for tfm_sp_log.h
+    # Link with tfm_sprt to get the include path for tfm_log_unpriv.h
+    # (the replacement for the removed tfm_sp_log.h) and to pull in the
+    # LOG_LEVEL_UNPRIV definition that header requires.
     tfm_sprt
   )
 
