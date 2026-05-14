@@ -7,7 +7,6 @@
 # (strip CONFIG_)
 
 # Platform
-kconfig_check_and_set_base(MBEDTLS_NO_PLATFORM_ENTROPY)
 kconfig_check_and_set_base(MBEDTLS_DEBUG_C)
 
 # Legacy configurations for _ALT defines
@@ -36,11 +35,6 @@ kconfig_check_and_set_base(MBEDTLS_SHA224_ALT)
 kconfig_check_and_set_base(MBEDTLS_SHA256_ALT)
 kconfig_check_and_set_base(MBEDTLS_SHA384_ALT)
 kconfig_check_and_set_base(MBEDTLS_SHA512_ALT)
-
-# Legacy configurations for RNG
-kconfig_check_and_set_base(MBEDTLS_ENTROPY_FORCE_SHA256)
-kconfig_check_and_set_base(MBEDTLS_NO_PLATFORM_ENTROPY)
-kconfig_check_and_set_base_int(MBEDTLS_ENTROPY_MAX_SOURCES)
 
 # Guard against setting legacy configurations in TF-M image
 if(NOT MBEDTLS_PSA_CRYPTO_SPM)
@@ -110,7 +104,6 @@ if(NOT MBEDTLS_PSA_CRYPTO_SPM)
   kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED)
   kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED)
   kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED)
-  kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED)
   kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED)
   kconfig_check_and_set_base(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED)
 endif()

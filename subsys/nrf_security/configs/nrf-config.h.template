@@ -17,7 +17,6 @@
  */
 
 /* Platform */
-#cmakedefine MBEDTLS_NO_PLATFORM_ENTROPY
 #cmakedefine MBEDTLS_DEBUG_C
 
 /* Legacy configurations for _ALT defines */
@@ -46,11 +45,6 @@
 #cmakedefine MBEDTLS_SHA256_ALT
 #cmakedefine MBEDTLS_SHA384_ALT
 #cmakedefine MBEDTLS_SHA512_ALT
-
-/* Legacy configuration for RNG */
-#cmakedefine MBEDTLS_ENTROPY_FORCE_SHA256
-#cmakedefine MBEDTLS_ENTROPY_MAX_SOURCES                        @MBEDTLS_ENTROPY_MAX_SOURCES@
-#cmakedefine MBEDTLS_NO_PLATFORM_ENTROPY
 
 /* Ensure these are not enabled internal in NS build */
 #if !defined(MBEDTLS_PSA_CRYPTO_SPM) && !defined(INSIDE_TFM_BUILD)
@@ -115,7 +109,6 @@
 #cmakedefine MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
 #cmakedefine MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
 #cmakedefine MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
-#cmakedefine MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
 #cmakedefine MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
 #cmakedefine MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
 
