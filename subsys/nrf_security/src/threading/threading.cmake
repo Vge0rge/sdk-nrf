@@ -7,7 +7,9 @@
 # This file includes threading support required by the PSA crypto core
 # Which was added in Mbed TLS 3.6.0.
 
-if(CONFIG_MBEDTLS_THREADING_C AND NOT CONFIG_NRF_CC3XX_PLATFORM)
+# When CC3XX driver is used, CC3XX platform library provides only function pointers,
+# so we still need to compile threading_alt.c to provide the actual implementations
+if(CONFIG_MBEDTLS_THREADING_C)
 
   append_with_prefix(src_crypto_core_oberon ${CMAKE_CURRENT_LIST_DIR}
     threading_alt.c
