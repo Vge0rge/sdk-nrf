@@ -34,6 +34,6 @@ endif() # CONFIG_SECURE_STORAGE_TRUSTED_STORAGE_COMPATIBILITY
 
 if(ncs_secure_storage_src)
   zephyr_library()
-  zephyr_library_link_libraries_ifdef(CONFIG_MBEDTLS mbedTLS)
+  zephyr_library_link_libraries_ifdef(CONFIG_TF_PSA_CRYPTO_BUILTIN tfpsacrypto)
   zephyr_library_sources(${ncs_secure_storage_src})
 endif()
