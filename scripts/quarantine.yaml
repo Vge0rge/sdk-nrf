@@ -118,6 +118,17 @@
   comment: "MCUboot RSA overflow, to be handled by Eris team"
 
 - scenarios:
+    - sample.tfm.psa_template
+    - tfm.psa_test_initial_attestation_lvl1
+    - tfm.psa_test_initial_attestation_lvl2
+  platforms:
+    - nrf5340dk/nrf5340/cpuapp/ns
+    - nrf9151dk/nrf9151/ns
+    - nrf9160dk/nrf9160/ns
+    - nrf9161dk/nrf9161/ns
+  comment: "Incompatible with Mbed TLS v4 - unquarantine with TF-M v2.3.0"
+
+- scenarios:
     - nrf.extended.sample.ipc.icmsg.nrf54h_nrf92_no_multithreading
     - drivers.grtc.test_mcuboot_grtc_no_uninit
     - drivers.grtc.test_mcuboot_grtc_uninit
