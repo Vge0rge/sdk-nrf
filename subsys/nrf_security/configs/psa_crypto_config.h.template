@@ -24,6 +24,11 @@
 #cmakedefine MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
 #cmakedefine MBEDTLS_PLATFORM_SNPRINTF_ALT
 
+#if defined(__NRF_TFM__)
+int nrf_security_tfm_printf(const char *fmt, ...);
+#define MBEDTLS_PLATFORM_STD_PRINTF nrf_security_tfm_printf
+#endif
+
 /* TF-M */
 #cmakedefine MBEDTLS_PSA_CRYPTO_SPM
 

@@ -21,6 +21,20 @@ target_include_directories(psa_crypto_library_config
 )
 
 if(BUILD_INSIDE_TFM)
+  target_sources(nrf_security_utils
+    PRIVATE
+      ${CMAKE_CURRENT_LIST_DIR}/nrf_security_tfm_printf.c
+  )
+
+  # tfm_vprintf_unpriv() ultimately calls tfm_hal_output_sp_log(), which is
+  # only provided when TF-M is built with TFM_SP_LOG_RAW_ENABLED=ON (i.e. a
+  # secure UART is enabled). When logging is silenced, compile the wrapper
+  # as a no-op to avoid an undefined reference at link time.
+  if(TFM_SP_LOG_RAW_ENABLED)
+    set_property(SOURCE ${CMAKE_CURRENT_LIST_DIR}/nrf_security_tfm_printf.c
+      APPEND PROPERTY COMPILE_DEFINITIONS NRF_SECURITY_TFM_HAS_SP_LOG)
+  endif()
+
   # This gives access to cmsis, nrfx and mdk. Link tfm_log_unpriv to
   # resolve the tfm_log_unpriv() symbol forward-declared by the
   # Zephyr-compat <zephyr/sys/__assert.h> shim (the replacement
