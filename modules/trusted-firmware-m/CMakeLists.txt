@@ -155,6 +155,18 @@ if(CONFIG_TFM_NFCT_PINS_AS_GPIOS)
   )
 endif()
 
+# Forward an externally-provided T_COSE_PATH to the TF-M build so the upstream
+# tf-m-tests / lib/ext/t_cose fetch_remote_library() step uses a local clone
+# instead of cloning from GitHub at configure time. Setting T_COSE_PATH on the
+# top-level CMake invocation (or earlier in a sample/test CMakeLists.txt) is
+# enough; mirrors the upstream CMSIS_PATH / TF_PSA_CRYPTO_PATH pattern.
+if(T_COSE_PATH)
+  set_property(TARGET zephyr_property_target
+    APPEND PROPERTY TFM_CMAKE_OPTIONS
+    -DT_COSE_PATH=${T_COSE_PATH}
+  )
+endif()
+
 zephyr_include_directories(${ZEPHYR_NRF_MODULE_DIR}/include/tfm)
 
 # Default values from config_base.h in TF-M.

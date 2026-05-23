@@ -66,6 +66,10 @@ if(NOT DEFINED TFM_PSA_TEST_SUITE)
 endif()
 set(TEST_PSA_API "${TFM_PSA_TEST_SUITE}")
 
+# Use the in-tree nrf_security copy of t_cose instead of having tf-m-tests
+# fetch it from GitHub at configure time.
+set(T_COSE_PATH "${ZEPHYR_NRF_MODULE_DIR}/subsys/nrf_security/src/t_cose")
+
 set_property(TARGET zephyr_property_target
              APPEND PROPERTY TFM_CMAKE_OPTIONS
              -DCONFIG_TFM_TEST_DIR=${TFM_TEST_DIR}
@@ -128,6 +132,7 @@ ExternalProject_Add(tfm_psa_arch_test_app
                 -DCROSS_COMPILE=${TFM_TOOLCHAIN_PATH}/${TFM_TOOLCHAIN_PREFIX}
                 -DPSA_TOOLCHAIN_FILE=${TFM_BINARY_DIR}/api_ns/cmake/${TFM_TOOLCHAIN_NS_FILE}
                 -DQCBOR_PATH${QCBOR_PATH_TYPE}=${CONFIG_TFM_QCBOR_PATH}
+                -DT_COSE_PATH=${T_COSE_PATH}
                 -DCMAKE_BUILD_TYPE=${tfm_ns_CMAKE_BUILD_TYPE}
                 -DTEST_PSA_API=${TEST_PSA_API}
                 -DZEPHYR_NRF_MODULE_DIR=${ZEPHYR_NRF_MODULE_DIR}
