@@ -24,6 +24,12 @@
 #include <zephyr/sys/util.h>
 #include <psa/nrf_platform_key_ids.h>
 
+#if defined(__has_builtin) && __has_builtin(__builtin_abs)
+#define cracen_abs(x) __builtin_abs(x)
+#else
+#define cracen_abs(x) ((x) < 0 ? -(x) : (x))
+#endif
+
 #define NOT_ENABLED_CURVE	(0)
 
 #if defined(PSA_NEED_CRACEN_KEY_TYPE_ECC_BRAINPOOL_P_R1)
@@ -734,11 +740,11 @@ psa_status_t cracen_ecc_h2e_sswu(sx_pk_req *req, psa_ecc_family_t curve_family,
 
 	if (z_int < 0) {
 		safe_memzero(zero_t_gx1_x_buf, sx_pk_curve_opsize(sx_curve));
-		cracen_be_add(zero_t_gx1_x_buf, sx_pk_curve_opsize(sx_curve), abs(z_int));
+		cracen_be_add(zero_t_gx1_x_buf, sx_pk_curve_opsize(sx_curve), cracen_abs(z_int));
 		cracen_be_sub(sx_pk_curve_prime(sx_curve), zero_t_gx1_x_buf, z_buf,
 			      sx_pk_curve_opsize(sx_curve));
 	} else {
-		cracen_be_add(z_buf, sx_pk_curve_opsize(sx_curve), abs(z_int));
+		cracen_be_add(z_buf, sx_pk_curve_opsize(sx_curve), cracen_abs(z_int));
 	}
 
 	sx_const_op modulo = {.sz = sx_pk_curve_opsize(sx_curve),
