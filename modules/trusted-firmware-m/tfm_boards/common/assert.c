@@ -68,3 +68,14 @@
 #endif
 
 #endif /* CONFIG_PARTITION_MANAGER_ENABLED */
+
+/* picolibc's <assert.h> expands assert() into a call to __assert_no_args() when
+ * NDEBUG and ASSERT_VERBOSE are not defined. The TF-M secure image is linked with -nostdlib
+ * (since it defaults to TFM_INCLUDE_STDLIBC=n), so  in some configurations this results
+ * to undefined reference to __assert_no_args() when assert() is used in the TF-M secure image.
+ * Make it weak so that that acts a fallback implementation.
+ */
+__WEAK __NO_RETURN void __assert_no_args(void)
+{
+	tfm_core_panic();
+}
