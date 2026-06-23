@@ -17,16 +17,28 @@
 			reg = <0x0 DT_SIZE_K(32)>;
 		};
 
-		s0_partition: slot0_partition: partition@8000 {
+		s0_partition: partition@8000 {
 			compatible = "zephyr,mapped-partition";
-			label = "image-0";
-			reg = <0x8000 DT_SIZE_K(724)>;
+			label = "mcuboot";
+			reg = <0x8000 DT_SIZE_K(68)>;
 		};
 
-		s1_partition: slot1_partition: partition@bd000 {
+		s1_partition: partition@bd000 {
+			compatible = "zephyr,mapped-partition";
+			label = "mcuboot_s1";
+			reg = <0xbd000 DT_SIZE_K(68)>;
+		};
+
+		slot0_partition: partition@19000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x19000 DT_SIZE_K(656)>;
+		};
+
+		slot1_partition: partition@ce000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
-			reg = <0xbd000 DT_SIZE_K(724)>;
+			reg = <0xce000 DT_SIZE_K(656)>;
 		};
 
 		storage_partition: partition@172000 {
