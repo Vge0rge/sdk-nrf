@@ -12,4 +12,4 @@
 /delete-node/ &storage_partition;
 
 
-#include "nrf54l15_partitions_mine.overlay"
+#include "nrf54l15_partitions.overlay"

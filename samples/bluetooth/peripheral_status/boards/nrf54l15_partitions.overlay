@@ -4,17 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-/*
- * Copyright (c) 2026 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
-
-/*
- * Copyright (c) 2026 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
 
 &cpuapp_rram {
 	partitions {
@@ -25,26 +14,26 @@
 		b0_partition: partition@0 {
 			compatible = "zephyr,mapped-partition";
 			label = "b0";
-			reg = <0x00000000 0x10000>;
+			reg = <0x0 DT_SIZE_K(32)>;
 		};
 
-		s0_partition: partition@10000 {
+		s0_partition: partition@8000 {
 			compatible = "zephyr,mapped-partition";
 			label = "mcuboot";
-			reg = <0x00010000 0x10000>;
+			reg = <0x8000 DT_SIZE_K(64)>;
 		};
 
-		s1_partition: partition@20000 {
+		s1_partition: partition@18000 {
 			compatible = "zephyr,mapped-partition";
 			label = "mcuboot_s1";
-			reg = <0x00020000 0x10000>;
+			reg = <0x18000 DT_SIZE_K(64)>;
 		};
 
-		tfm_storage_partition: partition@30000 {
+		tfm_storage_partition: partition@28000 {
 			compatible = "zephyr,mapped-partition";
 			label = "tfm-storage";
-			reg = <0x00030000 DT_SIZE_K(32)>;
-			ranges = <0x0 0x00030000 DT_SIZE_K(32)>;
+			reg = <0x28000 DT_SIZE_K(32)>;
+			ranges = <0x0 0x28000 DT_SIZE_K(32)>;
 			#address-cells = <1>;
 			#size-cells = <1>;
 
@@ -67,52 +56,52 @@
 			};
 		};
 
-		slot0_partition: partition@38000 {
+		slot0_partition: partition@30000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x00038000 0xa0000>;
-			ranges = <0x0 0x00038000 0xa0000>;
+			reg = <0x30000 DT_SIZE_K(656)>;
+			ranges = <0x0 0x30000 DT_SIZE_K(656)>;
 			#address-cells = <1>;
 			#size-cells = <1>;
 
 			slot0_s_partition: partition@0 {
 				compatible = "zephyr,mapped-partition";
 				label = "image-0-secure";
-				reg = <0x00000000 0x20000>;
+				reg = <0x0 DT_SIZE_K(128)>;
 			};
 
 			slot0_ns_partition: partition@20000 {
 				compatible = "zephyr,mapped-partition";
 				label = "image-0-nonsecure";
-				reg = <0x00020000 0x80000>;
+				reg = <0x20000 DT_SIZE_K(512)>;
 			};
 		};
 
-		slot1_partition: partition@d8000 {
+		slot1_partition: partition@d4000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
-			reg = <0x000d8000 0xa0000>;
-			ranges = <0x0 0x000d8000 0xa0000>;
+			reg = <0xd4000 DT_SIZE_K(656)>;
+			ranges = <0x0 0xd4000 DT_SIZE_K(656)>;
 			#address-cells = <1>;
 			#size-cells = <1>;
 
 			slot1_s_partition: partition@0 {
 				compatible = "zephyr,mapped-partition";
 				label = "image-1-secure";
-				reg = <0x00000000 0x20000>;
+				reg = <0x0 DT_SIZE_K(128)>;
 			};
 
 			slot1_ns_partition: partition@20000 {
 				compatible = "zephyr,mapped-partition";
 				label = "image-1-nonsecure";
-				reg = <0x00020000 0x80000>;
+				reg = <0x20000 DT_SIZE_K(512)>;
 			};
 		};
-
+		
 		storage_partition: partition@178000 {
 			compatible = "zephyr,mapped-partition";
 			label = "storage";
-			reg = <0x00178000 DT_SIZE_K(20)>;
+			reg = <0x178000 DT_SIZE_K(20)>;
 		};
 	};
 };
