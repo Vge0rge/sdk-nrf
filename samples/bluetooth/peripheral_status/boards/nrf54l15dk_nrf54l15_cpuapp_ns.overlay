@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-/delete-node/ &boot_partition;
 /delete-node/ &slot0_partition;
-/delete-node/ &slot1_partition;
+/delete-node/ &slot0_ns_partition;
+/delete-node/ &tfm_its_partition;
+/delete-node/ &tfm_otp_partition;
+/delete-node/ &tfm_ps_partition;
 /delete-node/ &storage_partition;
 
-#include "nrf54l15_partitions.overlay"
+
+#include "nrf54l15_partitions_mine.overlay"
