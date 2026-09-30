@@ -1,0 +1,38 @@
+sample:
+  description: |
+    Regression test for the CRACEN SRP-6a peer public value check: a peer value that is
+    0 mod N must be rejected, and a legitimate handshake must still complete.
+  name: CRACEN fixes
+
+common:
+  sysbuild: true
+  tags:
+    - psa
+    - cracen
+    - crypto
+    - ci_samples_crypto
+  harness: console
+  harness_config:
+    type: multi_line
+    regex:
+      - ".*SRP zero public value test passed.*"
+      - ".*Example finished successfully!.*"
+
+tests:
+  sample.cracen_fixes.cracen:
+    platform_allow:
+      - nrf54l15dk/nrf54l15/cpuapp
+      - nrf54l15dk/nrf54l15/cpuapp/ns
+      - nrf54l15dk/nrf54l10/cpuapp
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+      - nrf54lv10dk/nrf54lv10a/cpuapp
+      - nrf54lc10dk/nrf54lc10a/cpuapp
+      - nrf7120dk/nrf7120/cpuapp
+    integration_platforms:
+      - nrf54l15dk/nrf54l15/cpuapp
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+  sample.cracen_fixes.cracen.crypto_service:
+    platform_allow:
+      - nrf54h20dk/nrf54h20/cpuapp
+    integration_platforms:
+      - nrf54h20dk/nrf54h20/cpuapp
