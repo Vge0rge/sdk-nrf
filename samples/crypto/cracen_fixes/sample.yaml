@@ -1,7 +1,10 @@
 sample:
   description: |
-    Regression test for the CRACEN SRP-6a peer public value check: a peer value that is
-    0 mod N must be rejected, and a legitimate handshake must still complete.
+    Regression tests for two CRACEN findings. C-01: an SRP-6a peer public value that is
+    0 mod N must be rejected, and a legitimate handshake must still complete. H-02: AES-CCM
+    single-part decrypt must reject an oversized AEAD tag length instead of copying it into
+    a 16-byte stack buffer. H-02 only reaches the affected code on builds with
+    CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS, i.e. nRF54LM20A/B.
   name: CRACEN fixes
 
 common:
@@ -15,7 +18,7 @@ common:
   harness_config:
     type: multi_line
     regex:
-      - ".*SRP zero public value test passed.*"
+      - ".*C-01 SRP zero public value test passed.*"
       - ".*Example finished successfully!.*"
 
 tests:

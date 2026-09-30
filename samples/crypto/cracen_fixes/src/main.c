@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-/* PoC for C-01: SRP-6a peer public value A (or B) == 0 mod N must be rejected. */
+/* Regression tests for two CRACEN findings:
+ *
+ *   C-01 (critical) SRP-6a peer public value A (or B) == 0 mod N must be rejected
+ *   H-02 (high)     SW AES-CCM single-part decrypt copies an unvalidated tag length into a
+ *                   16-byte stack buffer
+ */
 
 #include <psa/crypto.h>
 #include <stdio.h>
@@ -363,14 +368,140 @@ cleanup_keys:
 	return ret;
 }
 
-int main(void)
+/*
+ * PoC for H-02: cracen_sw_aes_ccm_decrypt copies an unvalidated tag length into a 16-byte
+ * stack buffer.
+ *
+ * PSA encodes the AEAD tag length in 6 bits, so PSA_ALG_AEAD_WITH_SHORTENED_TAG() accepts a
+ * length up to 63. The PSA core checks only PSA_ALG_IS_AEAD and the nonce length, and the SW
+ * CCM single-part decrypt then does, in this order:
+ *
+ *   uint8_t tag_buffer[SX_BLKCIPHER_AES_BLK_SZ];                 -- 16 bytes
+ *   tag_size = PSA_AEAD_TAG_LENGTH(PSA_KEY_TYPE_AES, ..., alg);  -- 63
+ *   memcpy(tag_buffer, tag, tag_size);                           -- overflows by 47
+ *   status = cracen_sw_aes_ccm_decrypt_setup(...);               -- only validates here
+ *
+ * so 47 bytes of caller-supplied ciphertext land past the end of a 16-byte stack buffer,
+ * before anything has a chance to reject the tag length.
+ *
+ * Only reachable where cracen_sw_aead.c is the AEAD entry point, that is builds with
+ * CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS (nRF54LM20A/B), because it dispatches on
+ * PSA_ALG_AEAD_WITH_DEFAULT_LENGTH_TAG(alg) == PSA_ALG_CCM while forwarding the original alg.
+ * Elsewhere cracen_psa_aead.c dispatches on alg == PSA_ALG_CCM, which holds only for the
+ * default 16-byte tag, so the oversized tag never reaches the SW path.
+ *
+ * What this test can and cannot show. Measured on nrf54lm20a, the frame is
+ *
+ *   fbreg -616  tag_buffer  (16 bytes, ends at -601)
+ *   fbreg -600  operation   (cracen_aead_operation_t, ~600 bytes)
+ *
+ * so the 47 overflow bytes land inside operation, never reach the canary near the top of the
+ * frame, and operation is never read because the setup call bails at its own tag check. The
+ * call therefore returns PSA_ERROR_INVALID_ARGUMENT both before and after a fix, and this
+ * test cannot tell the two apart. It is kept because it documents the input, and because it
+ * would catch a fault if the frame layout ever changes so the overflow reaches live data.
+ *
+ * Returns 0 on success, -1 on failure.
+ */
+static int test_aead_ccm_oversized_tag(void)
 {
-	if (test_srp_server_rejects_zero_public_value() != 0) {
-		LOG_ERR("SRP zero public value test FAILED");
+	static const uint8_t key_bytes[16] = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+					      0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F};
+	static const uint8_t nonce[13] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+					  0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
+	const psa_algorithm_t alg = PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, 63);
+	const size_t tag_length = PSA_AEAD_TAG_LENGTH(PSA_KEY_TYPE_AES, 128, alg);
+	psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+	mbedtls_svc_key_id_t key = PSA_KEY_ID_NULL;
+	uint8_t ciphertext[63];
+	uint8_t plaintext[16];
+	size_t plaintext_length = 0;
+	psa_status_t status;
+	int ret = 0;
+
+	/* ciphertext_length == tag_length, so the whole buffer is treated as the tag and every
+	 * byte of it is copied. A recognisable filler makes the bytes that land past
+	 * tag_buffer easy to spot in a crash dump.
+	 */
+	memset(ciphertext, 0x41, sizeof(ciphertext));
+
+	psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
+	psa_set_key_bits(&attr, 128);
+	psa_set_key_algorithm(&attr, alg);
+	psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_DECRYPT);
+
+	status = psa_import_key(&attr, key_bytes, sizeof(key_bytes), &key);
+	if (status != PSA_SUCCESS) {
+		LOG_ERR("[CCM tag 63] key import failed: %d", status);
 		return -1;
 	}
 
-	LOG_INF("SRP zero public value test passed");
+	LOG_INF("[CCM tag 63] psa_aead_decrypt with a %u byte tag into a 16 byte buffer",
+		(unsigned int)tag_length);
+
+	/* Say up front whether this build can reach the affected code at all. Without the
+	 * workaround config, CCM goes to the HW path, where sxsymcrypt's sx_aead_create_aesccm()
+	 * already enforces 4 <= tagsz <= 16 and even, so a rejection here proves nothing about
+	 * the SW path.
+	 */
+	if (!IS_ENABLED(CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS)) {
+		LOG_WRN("[CCM tag 63] H-02 NOT EXERCISED: no "
+			"CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS, so CCM uses the HW path. "
+			"Build for nrf54lm20dk to reach cracen_sw_aes_ccm_decrypt()");
+	}
+
+	status = psa_aead_decrypt(key, alg, nonce, sizeof(nonce), NULL, 0, ciphertext,
+				  sizeof(ciphertext), plaintext, sizeof(plaintext),
+				  &plaintext_length);
+
+	if (status == PSA_ERROR_INVALID_ARGUMENT || status == PSA_ERROR_NOT_SUPPORTED) {
+		if (IS_ENABLED(CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS)) {
+			/* Beware: on an unfixed driver this same status arrives from
+			 * cracen_sw_aes_ccm_decrypt_setup(), which runs after the memcpy, so it
+			 * does not prove the copy was bounded. See the note above.
+			 */
+			LOG_INF("[CCM tag 63] tag length rejected (%d); see the note on what this "
+				"does and does not prove", status);
+		} else {
+			LOG_INF("[CCM tag 63] SKIP rejected by the HW path (%d)", status);
+		}
+	} else if (status == PSA_SUCCESS) {
+		LOG_ERR("[CCM tag 63] FAIL decrypt reported success with a 63 byte tag");
+		ret = -1;
+	} else {
+		LOG_ERR("[CCM tag 63] FAIL unexpected status %d", status);
+		ret = -1;
+	}
+
+	psa_destroy_key(key);
+
+	return ret;
+}
+
+int main(void)
+{
+	int ret = 0;
+
+	if (test_srp_server_rejects_zero_public_value() != 0) {
+		LOG_ERR("C-01 SRP zero public value test FAILED");
+		ret = -1;
+	} else {
+		LOG_INF("C-01 SRP zero public value test passed");
+	}
+
+	if (test_aead_ccm_oversized_tag() != 0) {
+		LOG_ERR("H-02 CCM oversized tag test FAILED");
+		ret = -1;
+	} else if (IS_ENABLED(CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS)) {
+		LOG_INF("H-02 CCM oversized tag test passed");
+	} else {
+		LOG_INF("H-02 CCM oversized tag test skipped on this platform");
+	}
+
+	if (ret != 0) {
+		return ret;
+	}
+
 	LOG_INF("Example finished successfully!");
 	return 0;
 }
