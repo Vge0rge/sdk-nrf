@@ -635,6 +635,94 @@ static int test_aead_ccm_oversized_key(void)
 	return ret;
 }
 
+/*
+ * PoC for H-3: truncated AES-CMAC single-shot writes a full 16-byte MAC into a buffer sized
+ * to the truncated length.
+ *
+ * cracen_sw_mac.c:196 checks only mac_size >= operation.mac_size, and operation.mac_size is
+ * the truncated length (4 here). It then hands the caller's buffer straight to
+ * cracen_cmac_compute(), which calls sx_mac_generate() with macsz = CMAC_MAC_SZ = 16, so the
+ * DMA writes 12 bytes past the end.
+ *
+ * The HW path is not affected: cracen_psa_mac.c routes single-shot through
+ * cracen_mac_sign_finish(), whose memcpy is bounded by operation->mac_size.
+ *
+ * A guard pattern follows the output, so this one reports instead of faulting.
+ *
+ * Returns 0 on success, -1 on failure.
+ */
+static int test_mac_truncated_cmac_overflow(void)
+{
+	static const uint8_t key_bytes[16] = {0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
+					      0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F};
+	static const uint8_t message[] = "cracen h-3";
+	const psa_algorithm_t alg = PSA_ALG_TRUNCATED_MAC(PSA_ALG_CMAC, 4);
+	struct {
+		uint8_t mac[4];
+		uint8_t guard[28];
+	} out;
+	psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+	mbedtls_svc_key_id_t key = PSA_KEY_ID_NULL;
+	size_t mac_length = 0;
+	psa_status_t status;
+	int ret = 0;
+
+	memset(&out, 0xA5, sizeof(out));
+
+	psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
+	psa_set_key_bits(&attr, 128);
+	psa_set_key_algorithm(&attr, alg);
+	psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE);
+
+	status = psa_import_key(&attr, key_bytes, sizeof(key_bytes), &key);
+	if (status != PSA_SUCCESS) {
+		LOG_ERR("[CMAC trunc 4] key import failed: %d", status);
+		return -1;
+	}
+
+	if (!IS_ENABLED(CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS)) {
+		LOG_WRN("[CMAC trunc 4] H-3 NOT EXERCISED: no "
+			"CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS, so MAC uses the HW path. "
+			"Build for nrf54lm20dk");
+	}
+
+	LOG_INF("[CMAC trunc 4] psa_mac_compute into a 4 byte buffer, CMAC produces 16");
+
+	status = psa_mac_compute(key, alg, message, sizeof(message) - 1, out.mac,
+				 sizeof(out.mac), &mac_length);
+
+	if (status != PSA_SUCCESS) {
+		LOG_ERR("[CMAC trunc 4] FAIL psa_mac_compute returned %d", status);
+		ret = -1;
+		goto exit;
+	}
+	if (mac_length != sizeof(out.mac)) {
+		LOG_ERR("[CMAC trunc 4] FAIL mac_length %u, expected %u",
+			(unsigned int)mac_length, (unsigned int)sizeof(out.mac));
+		ret = -1;
+	}
+
+	for (size_t i = 0; i < sizeof(out.guard); i++) {
+		if (out.guard[i] != 0xA5) {
+			LOG_ERR("[CMAC trunc 4] FAIL %u bytes written past the 4 byte buffer, "
+				"first at guard[%u] = 0x%02X",
+				(unsigned int)(sizeof(out.guard) - i), (unsigned int)i,
+				out.guard[i]);
+			ret = -1;
+			goto exit;
+		}
+	}
+
+	if (ret == 0) {
+		LOG_INF("[CMAC trunc 4] PASS the guard bytes are intact");
+	}
+
+exit:
+	psa_destroy_key(key);
+
+	return ret;
+}
+
 int main(void)
 {
 	int ret = 0;
@@ -653,6 +741,15 @@ int main(void)
 		LOG_INF("H-02 CCM oversized tag test passed");
 	} else {
 		LOG_INF("H-02 CCM oversized tag test skipped on this platform");
+	}
+
+	if (test_mac_truncated_cmac_overflow() != 0) {
+		LOG_ERR("H-3 truncated CMAC test FAILED");
+		ret = -1;
+	} else if (IS_ENABLED(CONFIG_PSA_NEED_CRACEN_MULTIPART_WORKAROUNDS)) {
+		LOG_INF("H-3 truncated CMAC test passed");
+	} else {
+		LOG_INF("H-3 truncated CMAC test skipped on this platform");
 	}
 
 	/* Last: on an affected build this one is expected to fault, not return. */
