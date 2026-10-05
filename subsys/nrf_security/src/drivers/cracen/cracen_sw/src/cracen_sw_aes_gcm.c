@@ -315,15 +315,19 @@ psa_status_t cracen_sw_aes_gcm_update(cracen_aead_operation_t *operation, const 
 		return PSA_ERROR_INVALID_ARGUMENT;
 	}
 
-	operation->ad_finished = true;
-
 	status = initialize_gcm_h(operation, &cipher);
 	if (status != PSA_SUCCESS) {
 		return status;
 	}
 	initialize_ctr(operation);
 
-	finalize_ad_padding(operation);
+	/* Pad the AD to a block boundary only once, on the first update. Later updates must keep
+	 * buffering a partial data block so GHASH sees the data as one contiguous stream.
+	 */
+	if (!operation->ad_finished) {
+		finalize_ad_padding(operation);
+		operation->ad_finished = true;
+	}
 
 	/* Process data with CTR mode encryption/decryption */
 	if (operation->dir == CRACEN_ENCRYPT) {
